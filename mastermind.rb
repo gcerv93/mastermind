@@ -74,4 +74,15 @@ class Game
   def display_code
     format(code)
   end
+
+  # check if the code given is correct
+  def player_guess
+    guess = gets.chomp
+    if /[1-6]{4}/.match?(guess) && guess.length == 4
+      guess.split('').map(&:to_i)
+    else
+      puts 'Invalid input! Please only 4 characters of numbers 1-6'
+      player_guess
+    end
+  end
 end
