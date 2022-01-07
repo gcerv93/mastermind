@@ -29,6 +29,28 @@ module Display
     end
   end
   # rubocop: enable Metrics/MethodLength
+
+  def welcome
+    puts "\nWelcome to Mastermind!"
+  end
+
+  def rules
+    puts "\nYour goal is to guess the computers code."
+    puts "\nThere are 6 different colors, each represented by a a different number, like so:  \n\n"
+    format([1, 2, 3, 4, 5, 6])
+    puts "\n\nYou must provide a guess each turn, after which you will be given a hint\n\n"
+    puts "#{circle_hint} - means correct color, wrong position\n"
+    puts "#{filled_circle_hint} - means correct color, correct position\n\n"
+    puts 'You will have 12 turns to figure out the code, Good Luck!'
+  end
+
+  def circle_hint
+    "\u25CB".encode('utf-8')
+  end
+
+  def filled_circle_hint
+    "\u25CF".encode('utf-8')
+  end
 end
 
 # class for the CodeMaker logic
@@ -45,6 +67,8 @@ class Game
   include Display
   def initialize
     @code = CodeMaker.new.code_generator
+    welcome
+    rules
   end
 
   def display_code
