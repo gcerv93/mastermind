@@ -1,0 +1,1 @@
+I will be creating the Mastermind board game using my acquired knowledge of the Ruby programming language.
