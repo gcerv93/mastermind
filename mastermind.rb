@@ -2,29 +2,10 @@
 
 require 'colorize'
 
-# class for the CodeMaker logic
-class CodeMaker
-  attr_reader :code
-
-  def initialize
-    @code = code_generator
-  end
-
-  def code_generator
-    4.times.map { rand(1..6) }
-  end
-end
-
-# class for the board
-class Board
-  attr_reader :code
-
-  def initialize
-    @code = CodeMaker.new.code
-  end
-
-  def format
-    code.map do |n|
+# display methods
+module Display
+  def format(code)
+    code.each do |n|
       print add_color(n, "  #{n}  ")
     end
   end
@@ -48,4 +29,25 @@ class Board
     end
   end
   # rubocop: enable Metrics/MethodLength
+end
+
+# class for the CodeMaker logic
+class CodeMaker
+  def code_generator
+    4.times.map { rand(1..6) }
+  end
+end
+
+# class for the game logic
+class Game
+  attr_reader :code
+
+  include Display
+  def initialize
+    @code = CodeMaker.new.code_generator
+  end
+
+  def display_code
+    format(code)
+  end
 end
