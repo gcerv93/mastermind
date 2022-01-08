@@ -61,6 +61,23 @@ module Display
   def win_message
     puts "\nHoly crap! You cracked the code!!!"
   end
+
+  def lose_message
+    puts "\nAww you lost, the code you were trying to crack was: \n\n"
+    format(code)
+    puts "\n\n"
+  end
+
+  def play_again?
+    puts "\nWould you like to play again?[Y/N]"
+    answer = gets.chomp
+    answer = gets.chomp unless answer.downcase == 'y' || answer.downcase == 'n'
+    if answer.downcase == 'y'
+      Game.new
+    else
+      puts "\nGoodbye! Thanks for playing!"
+    end
+  end
 end
 
 # class for the CodeMaker logic
@@ -86,12 +103,12 @@ class Game
     welcome
     rules
     game_loop
+    play_again?
   end
 
   def game_loop
     while turns <= 12
-      puts "\nTurn #{turns}, take a guess: "
-      display_guess(player_guess)
+      turn
       if win?
         win_message
         break
@@ -99,10 +116,12 @@ class Game
       hints.clear
       @turns += 1
     end
+    lose_message if turns == 13
   end
 
-  def display_code
-    format(code)
+  def turn
+    puts "\nTurn #{turns}, take a guess: "
+    display_guess(player_guess)
   end
 
   def player_guess
