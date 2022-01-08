@@ -68,13 +68,31 @@ end
 
 # class for the game logic
 class Game
-  attr_reader :code
+  attr_reader :code, :turns, :hints
 
   include Display
   def initialize
     @code = CodeMaker.new.code_generator
+    @turns = 1
+    @hints = []
+    game_start
+  end
+
+  def game_start
     welcome
     rules
+    game_loop
+  end
+
+  def game_loop
+    while turns <= 12
+      puts "\nTurn #{turns}, take a guess: "
+      display_guess(player_guess)
+      # if win?
+      #   break
+      # end
+      @turns += 1
+    end
   end
 
   def display_code
@@ -91,21 +109,35 @@ class Game
     end
   end
 
+  def display_guess(guess)
+    format(guess)
+    check_guess(guess)
+    display_hints(hints)
+    hints.clear
+  end
+
   def check_guess(guess)
-    hints = []
+    copy_of_code = code.dup
     guess.each_with_index do |n, idx|
       if n == code[idx]
         hints << filled_circle
-      elsif code.include?(n)
-        hints << circle
+        copy_of_code.delete(n)
       end
     end
-    format(guess)
-    display_hints(hints)
+    check_guess_helper(guess, copy_of_code)
+  end
+
+  def check_guess_helper(guess, copy)
+    guess.each do |n|
+      if copy.include?(n)
+        hints << circle
+        copy.delete(n)
+      end
+    end
   end
 
   def display_hints(hints)
     print "    Hints: #{format_hints(hints)}\n"
-    puts "\nYou cracked the code!" if hints.all? { |h| h == filled_circle }
+    puts "\nYou cracked the code!" if hints.all? { |h| h == filled_circle } && hints.length == 4
   end
 end
