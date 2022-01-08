@@ -30,18 +30,23 @@ module Display
   end
   # rubocop: enable Metrics/MethodLength
 
-  def welcome
-    puts "\nWelcome to Mastermind!"
+  def choose_game_mode
+    puts "\nWould you like to play CODEBREAKER or CODEMAKER?\n"
+    puts "\nPress '1' for CODEBREAKER. Press '2' for CODEMAKER"
+    answer = gets.chomp
+    answer = gets.chomp unless answer.downcase == '1' || answer.downcase == '2'
+    answer
   end
 
-  def rules
-    puts "\nYour goal is to guess the computers code."
+  def welcome
+    puts "\nWelcome to Mastermind!"
+    puts "\nThe goal of the game is to guess or break the code."
     puts "\nThere are 6 different colors, each represented by a a different number, like so:  \n\n"
     format([1, 2, 3, 4, 5, 6])
-    puts "\n\nYou must provide a guess each turn, after which you will be given a hint\n\n"
+    puts "\n\nA guess must be provided each turn, after which a hint will be given.\n\n"
     puts "#{circle} - means correct color, wrong position\n"
     puts "#{filled_circle} - means correct color, correct position\n\n"
-    puts 'You will have 12 turns to figure out the code, Good Luck!'
+    puts 'A total of 12 turns will be given to figure out the code.'
   end
 
   def circle
@@ -81,7 +86,7 @@ module Display
 end
 
 # class for the CodeMaker logic
-class CodeMaker
+class Computer
   def code_generator
     4.times.map { rand(1..6) }
   end
@@ -93,15 +98,13 @@ class Game
 
   include Display
   def initialize
-    @code = CodeMaker.new.code_generator
+    @code = Computer.new.code_generator
     @turns = 1
     @hints = []
-    game_start
+    welcome
   end
 
   def game_start
-    welcome
-    rules
     game_loop
     play_again?
   end
