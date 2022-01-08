@@ -101,12 +101,20 @@ class Computer
     return array.shuffle if length == 4
 
     array.map.with_index do |num, idx|
-      if (length - 1) > -1 && idx >= length
+      if length > -1 && idx >= length
         num + 1
       else
         num
       end
     end
+  end
+
+  def comp_win_message
+    puts "\nDamn!! The computer cracked your code! :("
+  end
+
+  def comp_lose_message
+    puts "\nThe computer could'nt break your code! You win!"
   end
 end
 
@@ -121,22 +129,19 @@ class Game
     @turns = 1
     @hints = []
     welcome
-    maker_or_breaker
+    game_start
   end
 
-  def maker_or_breaker
+  def game_start
     if choose_game_mode == '1'
       @code = computer.code_generator
-      game_start
+      game_loop
     else
       puts 'Please enter a 4 digit code with each number between 1-6'
       @code = input_code
       maker_loop
+      computer.comp_lose_message if turns == 13
     end
-  end
-
-  def game_start
-    game_loop
     play_again?
   end
 
@@ -157,7 +162,7 @@ class Game
     while turns <= 12
       maker_turn
       if win?
-        win_message
+        computer.comp_win_message
         break
       end
       computer.comp_guess = computer.generate_guess(hints.length, computer.comp_guess)
