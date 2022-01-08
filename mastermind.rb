@@ -87,10 +87,10 @@ end
 
 # class for the CodeMaker logic
 class Computer
-  attr_accessor :breaker_code
+  attr_accessor :comp_guess
 
   def initialize
-    @breaker_code
+    @comp_guess = [1, 1, 1, 1]
   end
 
   def code_generator
@@ -112,12 +112,12 @@ end
 
 # class for the game logic
 class Game
-  attr_reader :code, :turns, :hints, :breaker_code, :computer
+  attr_accessor :code
+  attr_reader :turns, :hints, :breaker_code, :computer
 
   include Display
   def initialize
     @computer = Computer.new
-    @code = computer.code_generator
     @turns = 1
     @hints = []
     welcome
@@ -126,10 +126,12 @@ class Game
 
   def maker_or_breaker
     if choose_game_mode == '1'
+      @code = computer.code_generator
       game_start
     else
       puts 'Please enter a 4 digit code with each number between 1-6'
-      computer.breaker_code = input_code
+      @code = input_code
+      maker_loop
     end
   end
 
@@ -140,7 +142,7 @@ class Game
 
   def game_loop
     while turns <= 12
-      turn
+      breaker_turn
       if win?
         win_message
         break
@@ -151,7 +153,25 @@ class Game
     lose_message if turns == 13
   end
 
-  def turn
+  def maker_loop
+    while turns <= 12
+      maker_turn
+      if win?
+        win_message
+        break
+      end
+      computer.comp_guess = computer.generate_guess(hints.length, computer.comp_guess)
+      hints.clear
+      @turns += 1
+    end
+  end
+
+  def maker_turn
+    puts "\nTurn #{turns}, take a guess: \n\n"
+    display_guess(computer.comp_guess)
+  end
+
+  def breaker_turn
     puts "\nTurn #{turns}, take a guess: "
     display_guess(input_code)
   end
