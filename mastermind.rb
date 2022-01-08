@@ -57,6 +57,10 @@ module Display
     hints.sort.each { |s| hint_string += " #{s}" }
     hint_string
   end
+
+  def win_message
+    puts "\nHoly crap! You cracked the code!!!"
+  end
 end
 
 # class for the CodeMaker logic
@@ -88,9 +92,11 @@ class Game
     while turns <= 12
       puts "\nTurn #{turns}, take a guess: "
       display_guess(player_guess)
-      # if win?
-      #   break
-      # end
+      if win?
+        win_message
+        break
+      end
+      hints.clear
       @turns += 1
     end
   end
@@ -113,31 +119,35 @@ class Game
     format(guess)
     check_guess(guess)
     display_hints(hints)
-    hints.clear
   end
 
   def check_guess(guess)
     copy_of_code = code.dup
+    copy_of_guess = guess.dup
     guess.each_with_index do |n, idx|
       if n == code[idx]
         hints << filled_circle
-        copy_of_code.delete(n)
+        copy_of_guess[idx] = 'O'
+        copy_of_code[idx] = 'X'
       end
     end
-    check_guess_helper(guess, copy_of_code)
+    check_guess_helper(copy_of_guess, copy_of_code)
   end
 
   def check_guess_helper(guess, copy)
     guess.each do |n|
       if copy.include?(n)
         hints << circle
-        copy.delete(n)
+        copy.delete_at(copy.index(n))
       end
     end
   end
 
   def display_hints(hints)
     print "    Hints: #{format_hints(hints)}\n"
-    puts "\nYou cracked the code!" if hints.all? { |h| h == filled_circle } && hints.length == 4
+  end
+
+  def win?
+    hints.all? { |h| h == filled_circle } && hints.length == 4
   end
 end
