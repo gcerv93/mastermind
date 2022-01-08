@@ -96,6 +96,18 @@ class Computer
   def code_generator
     4.times.map { rand(1..6) }
   end
+
+  def generate_guess(length, array = [1, 1, 1, 1])
+    return array.shuffle if length == 4
+
+    array.map.with_index do |num, idx|
+      if (length - 1) > -1 && idx >= length
+        num + 1
+      else
+        num
+      end
+    end
+  end
 end
 
 # class for the game logic
