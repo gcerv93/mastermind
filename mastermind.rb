@@ -87,6 +87,12 @@ end
 
 # class for the CodeMaker logic
 class Computer
+  attr_accessor :breaker_code
+
+  def initialize
+    @breaker_code
+  end
+
   def code_generator
     4.times.map { rand(1..6) }
   end
@@ -94,14 +100,25 @@ end
 
 # class for the game logic
 class Game
-  attr_reader :code, :turns, :hints
+  attr_reader :code, :turns, :hints, :breaker_code, :computer
 
   include Display
   def initialize
-    @code = Computer.new.code_generator
+    @computer = Computer.new
+    @code = computer.code_generator
     @turns = 1
     @hints = []
     welcome
+    maker_or_breaker
+  end
+
+  def maker_or_breaker
+    if choose_game_mode == '1'
+      game_start
+    else
+      puts 'Please enter a 4 digit code with each number between 1-6'
+      computer.breaker_code = input_code
+    end
   end
 
   def game_start
@@ -124,16 +141,16 @@ class Game
 
   def turn
     puts "\nTurn #{turns}, take a guess: "
-    display_guess(player_guess)
+    display_guess(input_code)
   end
 
-  def player_guess
-    guess = gets.chomp
-    if /[1-6]{4}/.match?(guess) && guess.length == 4
-      guess.split('').map(&:to_i)
+  def input_code
+    input = gets.chomp
+    if /[1-6]{4}/.match?(input) && input.length == 4
+      input.split('').map(&:to_i)
     else
       puts 'Invalid input! Please only 4 characters of numbers 1-6'
-      player_guess
+      input_code
     end
   end
 
