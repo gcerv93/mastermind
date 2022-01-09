@@ -72,11 +72,7 @@ class Computer
     return array.shuffle if length == 4
 
     array.map.with_index do |num, idx|
-      if length > -1 && idx >= length
-        num + 1
-      else
-        num
-      end
+      length > -1 && idx >= length ? num + 1 : num
     end
   end
 
@@ -106,19 +102,15 @@ class Player
     puts "\nWould you like to play CODEBREAKER or CODEMAKER?\n"
     puts "\nPress '1' for CODEBREAKER. Press '2' for CODEMAKER"
     answer = gets.chomp
-    answer = gets.chomp unless answer.downcase == '1' || answer.downcase == '2'
+    answer = gets.chomp until answer.downcase == '1' || answer.downcase == '2'
     answer
   end
 
   def play_again?
     puts "\nWould you like to play again?[Y/N]"
     answer = gets.chomp
-    answer = gets.chomp unless answer.downcase == 'y' || answer.downcase == 'n'
-    if answer.downcase == 'y'
-      Game.new
-    else
-      puts "\nGoodbye! Thanks for playing!"
-    end
+    answer = gets.chomp until answer.downcase == 'y' || answer.downcase == 'n'
+    answer.downcase == 'y' ? Game.new : (puts "\nGoodbye! Thanks for playing!")
   end
 
   def player_win_message
