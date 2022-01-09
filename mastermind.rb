@@ -32,7 +32,7 @@ module Display
 
   def welcome
     puts "\nWelcome to Mastermind!"
-    puts "\nThe goal of the game is to guess or break the code."
+    puts "\nThe goal of the game is to make or break the code."
     puts "\nThere are 6 different colors, each represented by a a different number, like so:  \n\n"
     format([1, 2, 3, 4, 5, 6])
     puts "\n\nA guess must be provided each turn, after which a hint will be given.\n\n"
@@ -53,16 +53,6 @@ module Display
     hint_string = ''
     hints.sort.each { |s| hint_string += " #{s}" }
     hint_string
-  end
-
-  def win_message
-    puts "\nHoly crap! You cracked the code!!!"
-  end
-
-  def lose_message
-    puts "\nAww you lost, the code you were trying to crack was: \n\n"
-    format(code)
-    puts "\n\n"
   end
 end
 
@@ -101,6 +91,7 @@ end
 
 # class for human player decisions
 class Player
+  include Display
   def input_code
     input = gets.chomp
     if /[1-6]{4}/.match?(input) && input.length == 4
@@ -129,12 +120,22 @@ class Player
       puts "\nGoodbye! Thanks for playing!"
     end
   end
+
+  def player_win_message
+    puts "\nHoly crap! You cracked the code!!!"
+  end
+
+  def player_lose_message(code)
+    puts "\nAww you lost, the code you were trying to crack was: \n\n"
+    format(code)
+    puts "\n\n"
+  end
 end
 
 # class for the game logic
 class Game
   attr_accessor :code
-  attr_reader :turns, :hints, :breaker_code, :computer, :player
+  attr_reader :turns, :hints, :computer, :player
 
   include Display
   def initialize
@@ -145,6 +146,8 @@ class Game
     welcome
     game_start
   end
+
+  private
 
   def game_start
     if player.choose_game_mode == '1'
@@ -163,13 +166,13 @@ class Game
     while turns <= 12
       player_turn
       if win?
-        win_message
+        player.player_win_message
         break
       end
       hints.clear
       @turns += 1
     end
-    lose_message if turns == 13
+    player.player_lose_message(code) if turns == 13
   end
 
   def comp_loop
