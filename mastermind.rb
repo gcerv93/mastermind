@@ -30,14 +30,6 @@ module Display
   end
   # rubocop: enable Metrics/MethodLength
 
-  def choose_game_mode
-    puts "\nWould you like to play CODEBREAKER or CODEMAKER?\n"
-    puts "\nPress '1' for CODEBREAKER. Press '2' for CODEMAKER"
-    answer = gets.chomp
-    answer = gets.chomp unless answer.downcase == '1' || answer.downcase == '2'
-    answer
-  end
-
   def welcome
     puts "\nWelcome to Mastermind!"
     puts "\nThe goal of the game is to guess or break the code."
@@ -71,17 +63,6 @@ module Display
     puts "\nAww you lost, the code you were trying to crack was: \n\n"
     format(code)
     puts "\n\n"
-  end
-
-  def play_again?
-    puts "\nWould you like to play again?[Y/N]"
-    answer = gets.chomp
-    answer = gets.chomp unless answer.downcase == 'y' || answer.downcase == 'n'
-    if answer.downcase == 'y'
-      Game.new
-    else
-      puts "\nGoodbye! Thanks for playing!"
-    end
   end
 end
 
@@ -118,14 +99,47 @@ class Computer
   end
 end
 
+# class for human player decisions
+class Player
+  def input_code
+    input = gets.chomp
+    if /[1-6]{4}/.match?(input) && input.length == 4
+      input.split('').map(&:to_i)
+    else
+      puts 'Invalid input! Please only 4 characters of numbers 1-6'
+      input_code
+    end
+  end
+
+  def choose_game_mode
+    puts "\nWould you like to play CODEBREAKER or CODEMAKER?\n"
+    puts "\nPress '1' for CODEBREAKER. Press '2' for CODEMAKER"
+    answer = gets.chomp
+    answer = gets.chomp unless answer.downcase == '1' || answer.downcase == '2'
+    answer
+  end
+
+  def play_again?
+    puts "\nWould you like to play again?[Y/N]"
+    answer = gets.chomp
+    answer = gets.chomp unless answer.downcase == 'y' || answer.downcase == 'n'
+    if answer.downcase == 'y'
+      Game.new
+    else
+      puts "\nGoodbye! Thanks for playing!"
+    end
+  end
+end
+
 # class for the game logic
 class Game
   attr_accessor :code
-  attr_reader :turns, :hints, :breaker_code, :computer
+  attr_reader :turns, :hints, :breaker_code, :computer, :player
 
   include Display
   def initialize
     @computer = Computer.new
+    @player = Player.new
     @turns = 1
     @hints = []
     welcome
@@ -133,21 +147,21 @@ class Game
   end
 
   def game_start
-    if choose_game_mode == '1'
+    if player.choose_game_mode == '1'
       @code = computer.code_generator
-      game_loop
+      player_loop
     else
       puts 'Please enter a 4 digit code with each number between 1-6'
-      @code = input_code
-      maker_loop
+      @code = player.input_code
+      comp_loop
       computer.comp_lose_message if turns == 13
     end
-    play_again?
+    player.play_again?
   end
 
-  def game_loop
+  def player_loop
     while turns <= 12
-      breaker_turn
+      player_turn
       if win?
         win_message
         break
@@ -158,9 +172,9 @@ class Game
     lose_message if turns == 13
   end
 
-  def maker_loop
+  def comp_loop
     while turns <= 12
-      maker_turn
+      comp_turn
       if win?
         computer.comp_win_message
         break
@@ -171,24 +185,14 @@ class Game
     end
   end
 
-  def maker_turn
+  def comp_turn
     puts "\nTurn #{turns}, take a guess: \n\n"
     display_guess(computer.comp_guess)
   end
 
-  def breaker_turn
+  def player_turn
     puts "\nTurn #{turns}, take a guess: "
-    display_guess(input_code)
-  end
-
-  def input_code
-    input = gets.chomp
-    if /[1-6]{4}/.match?(input) && input.length == 4
-      input.split('').map(&:to_i)
-    else
-      puts 'Invalid input! Please only 4 characters of numbers 1-6'
-      input_code
-    end
+    display_guess(player.input_code)
   end
 
   def display_guess(guess)
